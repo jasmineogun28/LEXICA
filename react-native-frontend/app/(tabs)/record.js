@@ -8,7 +8,7 @@ export default function Record() {
 
   const handleSubmit = async () => {
     try {
-      const response = await fetch('http://127.0.0.1:5000/process', {
+      const response = await fetch('http://192.168.0.11:5000/process', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

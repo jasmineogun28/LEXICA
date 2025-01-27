@@ -1,16 +1,24 @@
 import React from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, Pressable, Alert } from 'react-native';
+import { StyleSheet, Text, View, Pressable, Alert, Platform } from 'react-native';
 import styles from '../css/_styles';
 
 export default function Index() {
   const handlePress = () => {
-    Alert.alert('Pressable Pressed', 'You clicked the custom button!');
+    if (Platform.OS === 'web') {
+      // Use alert() for the web
+      window.alert('Pressable Pressed: You clicked the custom button!');
+    } else {
+      // Use Alert.alert for mobile platforms
+      Alert.alert('Pressable Pressed', 'You clicked the custom button!');
+    }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>Welcome to Lexica!{'\n'}Tap a button below to get started</Text>
+      <Text style={styles.text}>
+        Welcome to Lexica!{'\n'}Tap a button below to get started
+      </Text>
 
       <View style={styles.buttonRow}>
         <Pressable
@@ -37,4 +45,4 @@ export default function Index() {
       <StatusBar style="auto" />
     </View>
   );
-};
+}

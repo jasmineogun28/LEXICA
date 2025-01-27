@@ -37,14 +37,16 @@ const styles = StyleSheet.create({
     title: {
       fontSize: 24,
       marginBottom: 20,
+      color: '#8ECAE6',
     },
     input: {
-      width: '100%',
+      width: '30%',
       borderWidth: 1,
       borderColor: '#ccc',
       borderRadius: 5,
       padding: 10,
       marginBottom: 20,
+      color: 'white',
     },
     result: {
       marginTop: 20,
