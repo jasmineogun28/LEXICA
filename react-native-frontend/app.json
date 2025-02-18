@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "lexica-fyp-exp2",
-    "slug": "lexica-fyp-exp2",
+    "name": "LEXICA",
+    "slug": "LEXICA",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -9,13 +9,23 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "bundleIdentifier": "com.yourapp.identifier",
+      "infoPlist": {
+        "NSMicrophoneUsageDescription": "We need access to your microphone to record audio.",
+        "NSPhotoLibraryUsageDescription": "We need access to your media library to select files."
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "permissions": [
+        "CAMERA", 
+        "RECORD_AUDIO",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
+      ]
     },
     "web": {
       "bundler": "metro",

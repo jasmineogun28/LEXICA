@@ -3,13 +3,13 @@ import { StyleSheet } from 'react-native';
 const styles = StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: '#023047',
+      backgroundColor: '#219ebc',
       alignItems: 'center',
       justifyContent: 'center',
     },
     text: {
       fontSize: 20,
-      color: '#8ECAE6',
+      color: '#023047',
       textAlign: 'center',
       marginBottom: 20,
     },
@@ -53,6 +53,31 @@ const styles = StyleSheet.create({
       fontSize: 18,
       color: 'green',
     },
+    status: {
+      marginTop: 10,
+      fontSize: 16,
+      color: '#023047',
+    },
+      buttonsContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-evenly',
+        width: '80%', // Adjust width to your needs
+        marginTop: 20, // Adjust the vertical positioning of buttons
+        marginBottom: 20,
+      },
+      status: {
+        fontSize: 18,
+        marginTop: 10,
+      },
+      timerContainer: {
+        marginTop: 20,
+        justifyContent: 'center',
+        alignItems: 'center',
+      },
+      timerText: {
+        fontSize: 24,
+        marginTop: 10,
+      },
   });
 
 export default styles;
