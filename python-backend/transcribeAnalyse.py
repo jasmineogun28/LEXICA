@@ -7,7 +7,7 @@ from flask_cors import CORS
 import config
 
 app = Flask(__name__)
-CORS(app) 
+CORS(app)
 
 # Set API Key
 aai.settings.api_key = config.API_KEY
@@ -15,7 +15,7 @@ aai.settings.api_key = config.API_KEY
 AUDIO_EXTENSIONS = config.FILE_CONFIG["audio_extensions"]
 TEXT_EXTENSIONS = config.FILE_CONFIG["text_extensions"]
 UPLOAD_FOLDER = config.FILE_CONFIG["upload_folder"]
-os.makedirs(UPLOAD_FOLDER, exist_ok=True)  # Ensure upload folder exists
+os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
 
 # Function to check file type
@@ -26,7 +26,6 @@ def get_file_type(file_path):
     elif ext in TEXT_EXTENSIONS:
         return "text"
     return None
-
 
 # Function to upload audio for transcription
 def transcribe_audio(file_path):
@@ -48,7 +47,6 @@ def transcribe_audio(file_path):
     transcript = transcriber.transcribe(file_path)
 
     return transcript
-
 
 # Function to analyze a text transcript
 def analyze_text_transcript(file_path):
@@ -78,28 +76,24 @@ def analyze_text_transcript(file_path):
     except Exception as e:
         return {"error": f"Exception occurred: {str(e)}"}
 
-
 # Function to extract highlights
 def highlights_response(results):
     return [{"text": item.text, "count": item.count} for item in results]
-
 
 # Function to analyze sentiment
 def sentiment_response(results):
     sentiment_counts = defaultdict(lambda: {"POSITIVE": 0, "NEUTRAL": 0, "NEGATIVE": 0})
     
     for item in results:
-        speaker = item.speaker
-        sentiment = str(item.sentiment).split(".")[-1].upper()
+        speaker = getattr(item, "speaker", "Unknown")  # Use getattr to safely get the speaker
+        sentiment = str(item.sentiment).split(".")[-1].upper()  # Extract sentiment label
         sentiment_counts[speaker][sentiment] += 1
 
     return sentiment_counts
 
-
 # Function to extract confidence measure
 def confidence_measure(results):
     return {"confidence": results}
-
 
 # Function to count disfluencies
 def disfluency_count(transcript):
@@ -120,7 +114,10 @@ def disfluency_count(transcript):
 
     speaker_counts = {}
 
-    for utterance in transcript.utterances:
+    # Ensure transcript.utterances exists
+    utterances = getattr(transcript, "utterances", [])
+
+    for utterance in utterances:
         speaker = utterance.speaker if utterance.speaker else "Unknown"
         words = utterance.text.lower().split()
 
@@ -133,7 +130,6 @@ def disfluency_count(transcript):
                     speaker_counts[speaker][disfluency] += 1
 
     return speaker_counts
-
 
 # Function to process file
 def process_file(file_path):
@@ -164,7 +160,6 @@ def process_file(file_path):
 
     return {"error": "Unsupported file type"}
 
-
 # Route to upload file and process it
 @app.route("/upload", methods=["POST"])
 def upload_file():
@@ -186,8 +181,10 @@ def upload_file():
     result = process_file(file_path)
     return jsonify(result)
 
-    
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=5000)
 
-# "https://assemblyaiusercontent.com/playground/ojp_NQdFx0U.wav"
+print("API_KEY:", config.API_KEY)
+print("UPLOAD_FOLDER:", config.FILE_CONFIG["upload_folder"])
+print("AUDIO_EXTENSIONS:", config.FILE_CONFIG["audio_extensions"])
+print("TEXT_EXTENSIONS:", config.FILE_CONFIG["text_extensions"])

@@ -1,15 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import axios from "axios";
+import { ResponseContext } from "./context/ResponseContext"; 
 
 const FileUpload = () => {
+  const { setResponseData } = useContext(ResponseContext); 
   const [file, setFile] = useState(null);
-  const [response, setResponse] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
   const handleFileChange = (event) => {
     setFile(event.target.files[0]);
-    setResponse(null);
     setError(null);
   };
 
@@ -30,7 +30,7 @@ const FileUpload = () => {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      setResponse(res.data);
+      setResponseData(res.data);  // Store response globally
     } catch (err) {
       setError("Error uploading file. Please try again.");
     } finally {
@@ -47,15 +47,9 @@ const FileUpload = () => {
       </button>
 
       {error && <p style={{ color: "red" }}>{error}</p>}
-
-      {response && (
-        <div className="response">
-          <h3>Response:</h3>
-          <pre>{JSON.stringify(response, null, 2)}</pre>
-        </div>
-      )}
     </div>
   );
 };
 
 export default FileUpload;
+

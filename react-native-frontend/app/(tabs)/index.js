@@ -2,6 +2,7 @@ import React from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, Pressable, Alert, Platform } from 'react-native';
 import styles from '../css/_styles';
+import FileUpload from "../FileUpload";
 
 export default function Index() {
   const handlePress = () => {
@@ -39,10 +40,25 @@ export default function Index() {
           ]}
         >
           <Text style={styles.buttonText}>Upload Audio</Text>
-        </Pressable>
+        </Pressable>   
+
+        <FileUpload />
+
       </View>
 
       <StatusBar style="auto" />
     </View>
   );
 }
+
+
+// const App = () => {
+//   return (
+//     <div className="Vocab Wrapped">
+//       <h1>Speech & Text Analysis</h1>
+//       <FileUpload />
+//     </div>
+//   );
+// };
+
+// export default App;
