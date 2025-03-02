@@ -1,11 +1,11 @@
-import { Stack } from 'expo-router';
+import { Stack } from "expo-router";
 
-//root layout
 export default function RootLayout() {
   return (
-    <Stack>
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      <Stack.Screen name="+not-found" />
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="index" /> {/* Default loading screen */}
+      <Stack.Screen name="introScreen" />
+      <Stack.Screen name="(tabs)" /> {/* This includes the TabNavigator */}
     </Stack>
   );
 }

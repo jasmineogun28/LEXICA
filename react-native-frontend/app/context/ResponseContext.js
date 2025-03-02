@@ -11,3 +11,5 @@ export const ResponseProvider = ({ children }) => {
     </ResponseContext.Provider>
   );
 };
+
+export default ResponseContext;

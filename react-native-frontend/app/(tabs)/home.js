@@ -4,7 +4,7 @@ import { StyleSheet, Text, View, Pressable, Alert, Platform } from 'react-native
 import styles from '../css/_styles';
 import FileUpload from "../FileUpload";
 
-export default function Index() {
+export default function Home() {
   const handlePress = () => {
     if (Platform.OS === 'web') {
       // Use alert() for the web
