@@ -4,7 +4,7 @@ import { ResponseProvider } from '../context/ResponseContext'; // Import the pro
 
 export default function TabNavigator() {
   return (
-    <ResponseProvider> {/* Wrap the entire tab layout */}
+    // <ResponseProvider> {/* Wrap the entire tab layout */}
       <Tabs
         screenOptions={{
           tabBarActiveTintColor: '#ffb703',
@@ -62,6 +62,6 @@ export default function TabNavigator() {
           }}
         />
       </Tabs>
-    </ResponseProvider>
+    // </ResponseProvider>
   );
 }

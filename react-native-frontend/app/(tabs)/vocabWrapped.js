@@ -1,10 +1,16 @@
-import React, { useContext } from "react";
-import { ScrollView, View, Text } from "react-native";
+import React, { useContext, useEffect } from "react";
+import { ScrollView, View, Text, Button } from "react-native";
 import { ResponseContext } from "../context/ResponseContext";
 import styles from "../css/_styles";
+import { useRouter } from "expo-router";
 
 const VocabWrapped = () => {
+  const router = useRouter();
   const { responseData } = useContext(ResponseContext);
+
+  useEffect(() => {
+    console.log("Data in vocabWrapped:", responseData);
+  }, [responseData]);
 
   if (!responseData) {
     return <Text style={styles.text}>Waiting for analysis...</Text>;
@@ -32,6 +38,10 @@ const VocabWrapped = () => {
         <Text style={styles.text}>Disfluencies:</Text>
         <Text>{JSON.stringify(responseData.disfluencies, null, 2)}</Text>
       </ScrollView>
+
+
+      <Button title="Back to START" onPress={() => router.push("/(screens)/options")} />
+    
     </View>
   );
 };

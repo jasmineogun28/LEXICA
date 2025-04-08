@@ -1,15 +1,23 @@
-import React, { useState, useContext } from "react";
-import { View, Text, Button, StyleSheet, Platform } from "react-native";
-import * as DocumentPicker from 'expo-document-picker';
+import React, { useState, useContext, useEffect } from "react";
+import { View, Text, Button, StyleSheet, Platform, TouchableOpacity } from "react-native";
+import * as DocumentPicker from "expo-document-picker";
 import axios from "axios";
-import { ResponseContext } from "./context/ResponseContext";
+import { ResponseContext } from "./context/ResponseContext.js";
+import { useRouter } from "expo-router";
 
 const FileSelectorUpload = () => {
-  const { setResponseData } = useContext(ResponseContext);
+  const { responseData, setResponseData } = useContext(ResponseContext);
   const [file, setFile] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [uploading, setUploading] = useState(false); // Tracks if upload is complete
+  const router = useRouter();
+
+  // Debugging: Log uploading state when it changes
+  useEffect(() => {
+    console.log("Uploading state changed:", uploading);
+  }, [uploading]);
 
   const handleFileChange = (event) => {
     setFile(event.target.files[0]);
@@ -46,7 +54,11 @@ const FileSelectorUpload = () => {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
+      console.log("***Received response:", res.data);
       setResponseData(res.data); // Store response globally
+      setUploading(true); // Set uploading to true when upload is complete
+      console.log("Uploading state set to true");
+      router.push("/(tabs)/vocabWrapped"); // Navigate to the next page
     } catch (err) {
       setError("Error uploading file. Please try again.");
       console.error(err);
@@ -55,19 +67,24 @@ const FileSelectorUpload = () => {
     }
   };
 
+  const handleNext = () => {
+    console.log("Navigating to vocabWrapped page");
+    router.push("/(tabs)/vocabWrapped"); // Navigate to the next page
+  };
+
   const selectFileIOS = async () => {
     try {
       const result = await DocumentPicker.getDocumentAsync({
-        type: 'audio/*',
-        copyToCacheDirectory: true
+        type: "audio/*",
+        copyToCacheDirectory: true,
       });
-      
-      if (result.type === 'success') {
+
+      if (result.type === "success") {
         setSelectedFile(result);
         setError(null);
       }
     } catch (err) {
-      setError('Failed to select file');
+      setError("Failed to select file");
       console.error(err);
     }
   };
@@ -88,30 +105,34 @@ const FileSelectorUpload = () => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Upload an Audio File</Text>
-      
+
       <Button
         title="Select Audio File"
         onPress={selectFileIOS}
         disabled={loading}
       />
-      
+
       {selectedFile && (
-        <Text style={styles.fileInfo}>
-          Selected: {selectedFile.name}
-        </Text>
+        <Text style={styles.fileInfo}>Selected: {selectedFile.name}</Text>
       )}
-      
+
       <Button
         title={loading ? "Uploading..." : "Upload"}
         onPress={handleUpload}
         disabled={loading || !selectedFile}
       />
+
+    <Button
+        title={loading ? "Wait..." : "Click to go to Next page"}
+        onPress={handleNext}
+        disabled={loading || !selectedFile}
+      />
+
+      {error && <Text style={styles.errorText}>{error}</Text>}
+
       
-      {error && (
-        <Text style={styles.errorText}>
-          {error}
-        </Text>
-      )}
+        
+      
     </View>
   );
 };
@@ -119,7 +140,7 @@ const FileSelectorUpload = () => {
 const styles = StyleSheet.create({
   container: {
     padding: 20,
-    alignItems: 'center',
+    alignItems: "center",
   },
   title: {
     fontSize: 18,
@@ -127,12 +148,23 @@ const styles = StyleSheet.create({
   },
   fileInfo: {
     marginVertical: 15,
-    color: '#666',
+    color: "#666",
   },
   errorText: {
-    color: 'red',
-    marginTop: 10
-  }
+    color: "red",
+    marginTop: 10,
+  },
+  button: {
+    backgroundColor: "green",
+    padding: 10,
+    borderRadius: 5,
+    alignItems: "center",
+  },
+  buttonText: {
+    color: "white",
+    fontSize: 16,
+    fontWeight: "bold",
+  },
 });
 
 export default FileSelectorUpload;

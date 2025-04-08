@@ -2,7 +2,7 @@ import React from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, Pressable, Alert, Platform } from 'react-native';
 import styles from '../css/_styles';
-import FileUpload from "../FileUpload";
+// import FileUpload from "../FileUpload";
 import AudioRecorderUpload from '../AudioRecorderUpload';
 import FileSelectorUpload from '../FileSelectorUpload';
 

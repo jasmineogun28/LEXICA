@@ -16,10 +16,10 @@ const OptionsScreen = () => {
       <View style={styles.button}>
       <Button title="UPLOAD" onPress={() => router.push("/(screens)/upload")} />
         </View>
-
+{/* 
         <View style={styles.button}>
       <Button title="FIX API" onPress={() => router.push("/(screens)/fixApi")} />
-        </View>
+        </View> */}
     </View>
   );
 };

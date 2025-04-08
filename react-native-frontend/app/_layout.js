@@ -1,11 +1,16 @@
 import { Stack } from "expo-router";
+import { ResponseProvider } from "./context/ResponseContext";
 
 export default function RootLayout() {
+
   return (
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="index" /> {/* Default loading screen */}
-      <Stack.Screen name="introScreen" />
-      <Stack.Screen name="(tabs)" /> {/* This includes the TabNavigator */}
-    </Stack>
+    <ResponseProvider> 
+      <Stack screenOptions={{ headerShown: true }}>
+        <Stack.Screen name="(screens)/index" /> 
+        <Stack.Screen name="(screens)/introScreen" />
+        <Stack.Screen name="(screens)/options" />
+        <Stack.Screen name="(tabs)" />
+      </Stack>
+    </ResponseProvider>
   );
 }
