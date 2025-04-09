@@ -11,10 +11,9 @@ const FileSelectorUpload = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [uploading, setUploading] = useState(false); // Tracks if upload is complete
+  const [uploading, setUploading] = useState(false); 
   const router = useRouter();
 
-  // Debugging: Log uploading state when it changes
   useEffect(() => {
     console.log("Uploading state changed:", uploading);
   }, [uploading]);
@@ -58,7 +57,7 @@ const FileSelectorUpload = () => {
       setResponseData(res.data); // Store response globally
       setUploading(true); // Set uploading to true when upload is complete
       console.log("Uploading state set to true");
-      router.push("/(tabs)/vocabWrapped"); // Navigate to the next page
+      router.push("/(tabs)/vocabWrapped"); 
     } catch (err) {
       setError("Error uploading file. Please try again.");
       console.error(err);
@@ -69,7 +68,7 @@ const FileSelectorUpload = () => {
 
   const handleNext = () => {
     console.log("Navigating to vocabWrapped page");
-    router.push("/(tabs)/vocabWrapped"); // Navigate to the next page
+    router.push("/(tabs)/vocabWrapped"); 
   };
 
   const selectFileIOS = async () => {
@@ -92,7 +91,6 @@ const FileSelectorUpload = () => {
   if (Platform.OS === "web") {
     return (
       <div className="container">
-        <h2>Upload an Audio File</h2>
         <input type="file" onChange={handleFileChange} />
         <button onClick={handleUpload} disabled={loading}>
           {loading ? "Uploading..." : "Upload"}
@@ -104,8 +102,6 @@ const FileSelectorUpload = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Upload an Audio File</Text>
-
       <Button
         title="Select Audio File"
         onPress={selectFileIOS}
@@ -129,9 +125,6 @@ const FileSelectorUpload = () => {
       />
 
       {error && <Text style={styles.errorText}>{error}</Text>}
-
-      
-        
       
     </View>
   );
@@ -141,10 +134,6 @@ const styles = StyleSheet.create({
   container: {
     padding: 20,
     alignItems: "center",
-  },
-  title: {
-    fontSize: 18,
-    marginBottom: 20,
   },
   fileInfo: {
     marginVertical: 15,

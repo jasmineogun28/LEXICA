@@ -5,9 +5,9 @@ import { Platform, View, Text, Button, StyleSheet } from "react-native";
 import Svg, { Circle } from "react-native-svg";
 import { useRouter } from "expo-router";
 
-const MAX_RECORD_TIME = 60; // Maximum recording time in seconds
+const MAX_RECORD_TIME = 60;
 
-const AudioRecorderUpload = () => {
+const AudioRecorderUpload = ({ selectedTopic, isRecording, setIsRecording }) => {
   const { responseData, setResponseData } = useContext(ResponseContext);
   const [recording, setRecording] = useState(null);
   const [audioFile, setAudioFile] = useState(null);
@@ -36,7 +36,7 @@ const AudioRecorderUpload = () => {
 
   useEffect(() => {
     if (responseData) {
-      console.log("✅ Updated response data:", responseData);
+      console.log("Updated response data:", responseData);
     }
   }, [responseData]);
 
@@ -71,12 +71,14 @@ const AudioRecorderUpload = () => {
           setAudioFile(audioBlob);
           setRecording(null);
           resetTimer();
+          setIsRecording(false);
         };
 
         mediaRecorder.start();
         setRecording(mediaRecorder);
+        setIsRecording(true);
       } else {
-        console.log("🎙️ iOS recording not implemented yet");
+        console.log("iOS recording not implemented yet");
       }
     } catch (err) {
       console.error("Microphone error:", err);
@@ -89,6 +91,7 @@ const AudioRecorderUpload = () => {
       recording.stop();
       setRecording(null);
       resetTimer();
+      setIsRecording(false);
     }
   };
 
@@ -97,7 +100,12 @@ const AudioRecorderUpload = () => {
       setError("No audio file to upload!");
       return;
     }
-
+  
+    if (audioFile.size === 0) {
+      setError("Audio file is empty. Please re-record.");
+      return;
+    }
+  
     const formData = new FormData();
     if (Platform.OS === "web") {
       formData.append("file", audioFile, "recorded_audio.wav");
@@ -108,25 +116,32 @@ const AudioRecorderUpload = () => {
         type: "audio/m4a",
       });
     }
-
+  
     setLoading(true);
     setError(null);
-
+  
     try {
       const res = await axios.post("http://127.0.0.1:5000/upload", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-
-      console.log("✅ Upload response:", res);
+  
+      console.log("Upload response:", res);
+  
+      if (res.data?.error?.includes("language_detection cannot be performed")) {
+        setError("No spoken audio detected. Please try recording again.");
+        return;
+      }
+  
       setResponseData(res.data);
       setUploaded(true);
     } catch (err) {
-      console.error("❌ Upload error:", err);
+      console.error("Upload error:", err);
       setError("Error uploading file. Please try again.");
     } finally {
       setLoading(false);
     }
   };
+  
 
   const handleDownload = () => {
     if (!audioFile) {
@@ -141,13 +156,12 @@ const AudioRecorderUpload = () => {
       link.download = "recorded_audio.wav";
       link.click();
     } else {
-      console.log("⬇️ iOS download not implemented yet");
+      console.log("iOS download not implemented yet");
     }
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Record an Audio File</Text>
       <Text style={styles.timerText}>Time Left: {formatTime(timeLeft)}</Text>
 
       <View style={styles.timerContainer}>
@@ -167,33 +181,41 @@ const AudioRecorderUpload = () => {
         </Svg>
       </View>
 
-      <Button
-        title={recording ? "Stop Recording" : "Start Recording"}
-        onPress={recording ? stopRecording : startRecording}
-      />
-
-      {audioFile && <Text style={styles.fileText}>File: recorded_audio.wav</Text>}
-
-      <Button
-        title="Upload File"
-        onPress={handleUpload}
-        disabled={!audioFile || loading}
-      />
-
-      <Button
-        title="Download Recording"
-        onPress={handleDownload}
-        disabled={!audioFile}
-      />
-
-      {uploaded && (
-        <Button
-          title="Next"
-          onPress={() => router.push("/(tabs)/vocabWrapped")}
-        />
-      )}
-
       {error && <Text style={styles.errorText}>{error}</Text>}
+
+      <View style={{ flexDirection: "row", justifyContent: "space-between", width: "100%", marginTop: 20 }}>
+        {/* Left Column */}
+        <View style={{ flex: 1, marginRight: 10 }}>
+          <Button
+            title={recording ? "Stop Recording" : "Start Recording"}
+            onPress={recording ? stopRecording : startRecording}
+          />
+          <View style={{ marginTop: 10 }}>
+            <Button
+              title="Download Recording"
+              onPress={handleDownload}
+              disabled={!audioFile}
+            />
+          </View>
+        </View>
+
+        {/* Right Column */}
+        <View style={{ flex: 1, marginLeft: 10 }}>
+          <Button
+            title="Upload File"
+            onPress={handleUpload}
+            disabled={!audioFile || loading}
+          />
+          {uploaded && (
+            <View style={{ marginTop: 10 }}>
+              <Button
+                title="Next"
+                onPress={() => router.push("/(tabs)/vocabWrapped")}
+              />
+            </View>
+          )}
+        </View>
+      </View>
     </View>
   );
 };
@@ -201,6 +223,7 @@ const AudioRecorderUpload = () => {
 const styles = StyleSheet.create({
   container: {
     padding: 20,
+    paddingHorizontal: 10,
     alignItems: "center",
   },
   title: {

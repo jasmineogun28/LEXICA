@@ -3,27 +3,28 @@ import { StyleSheet } from 'react-native';
 const styles = StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: '#219ebc',
+      backgroundColor: '#c0eef0',
       alignItems: 'center',
-      justifyContent: 'flex-start', // Ensure content is aligned at the top
-      paddingTop: 20, // Padding to make it look better
+      justifyContent: 'flex-start', 
+      paddingTop: 80, 
     },
     text: {
       fontSize: 20,
       color: '#023047',
-      textAlign: 'left', // Changed to left alignment for better readability
-      marginBottom: 10, // Added margin to separate text elements
+      textAlign: 'left', 
+      marginBottom: 10, 
     },
     title: {
       fontSize: 24,
+      fontWeight: 'bold',
       marginBottom: 20,
-      color: '#8ECAE6',
-      textAlign: 'center', // Centered title
+      color: '#023047',
+      textAlign: 'center', 
     },
     responseContainer: {
       flex: 1,
       width: '90%',
-      maxHeight: 500, // Adjust this value to control the max height of the scrollable area
+      maxHeight: 500, 
       backgroundColor: '#f9f9f9',
       borderWidth: 1,
       borderColor: '#ccc',
@@ -32,7 +33,7 @@ const styles = StyleSheet.create({
       marginTop: 20,
     },
     scrollView: {
-      flexGrow: 1, // Ensures the scroll grows to fill available space
+      flexGrow: 1, 
     },
 });
 

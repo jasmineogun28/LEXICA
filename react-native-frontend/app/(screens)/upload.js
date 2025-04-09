@@ -3,8 +3,6 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View, Pressable, Alert, Platform , Button} from 'react-native';
 import styles from '../css/_styles';
 import FileSelectorUpload from '../FileSelectorUpload';
-// import { FileResponseProvider } from "../context/FileResponseContext";
-import { ResponseProvider } from '../context/ResponseContext';
 import { useRouter } from "expo-router";
 
 export default function Upload() {
@@ -14,11 +12,9 @@ export default function Upload() {
     <View style={styles.container}>
       <View style={styles.buttonRow}>
 
-        {/* <ResponseProvider> */}
+      <Text style={styles.title}>Upload an Audio File</Text>
+      <Text style={{ fontSize: 18, fontWeight: '600', marginBottom: 8 , color: '#023047'}}>📂 File Upload:</Text>
           <FileSelectorUpload/>
-
-          {/* <Button title="wrapped" onPress={() => router.push("/(tabs)/vocabWrapped")} /> */}
-        {/* </ResponseProvider> */}
         
       </View>
 

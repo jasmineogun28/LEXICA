@@ -1,10 +1,9 @@
 import { Tabs } from 'expo-router';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { ResponseProvider } from '../context/ResponseContext'; // Import the provider
+import { ResponseProvider } from '../context/ResponseContext'; 
 
 export default function TabNavigator() {
   return (
-    // <ResponseProvider> {/* Wrap the entire tab layout */}
       <Tabs
         screenOptions={{
           tabBarActiveTintColor: '#ffb703',
@@ -18,15 +17,6 @@ export default function TabNavigator() {
           },
         }}
       >
-        <Tabs.Screen
-          name="home"
-          options={{
-            title: 'Home',
-            tabBarIcon: ({ color, focused }) => (
-              <Ionicons name={focused ? 'home-sharp' : 'home-outline'} color={color} size={24} />
-            ),
-          }}
-        />
 
         <Tabs.Screen
           name="vocabWrapped"
@@ -47,21 +37,6 @@ export default function TabNavigator() {
             ),
           }}
         />
-
-        {/* Hidden screens */}
-        <Tabs.Screen
-          name="record"
-          options={{
-            tabBarStyle: { display: 'none' }, // Hide from tab bar
-          }}
-        />
-        <Tabs.Screen
-          name="Fileupload"
-          options={{
-            tabBarStyle: { display: 'none' }, // Hide from tab bar
-          }}
-        />
       </Tabs>
-    // </ResponseProvider>
   );
 }
