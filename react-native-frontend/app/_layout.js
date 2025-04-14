@@ -5,7 +5,7 @@ export default function RootLayout() {
 
   return (
     <ResponseProvider> 
-      <Stack screenOptions={{ headerShown: true }}>
+      <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(screens)/index" /> 
         <Stack.Screen name="(screens)/introScreen" />
         <Stack.Screen name="(screens)/options" />
