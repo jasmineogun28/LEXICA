@@ -4,6 +4,7 @@ import { ResponseContext } from "./context/ResponseContext";
 import { Platform, View, Text, Button, StyleSheet } from "react-native";
 import Svg, { Circle } from "react-native-svg";
 import { useRouter } from "expo-router";
+import config from "../constants/config.json";
 
 const MAX_RECORD_TIME = 60;
 
@@ -121,10 +122,16 @@ const AudioRecorderUpload = ({ selectedTopic, isRecording, setIsRecording }) => 
     setError(null);
   
     try {
-      const res = await axios.post("http://127.0.0.1:5000/upload", formData, {
+      // const res = await axios.post("http://127.0.0.1:5000/upload", formData, {
+      //   headers: { "Content-Type": "multipart/form-data" },
+      // });
+
+      const res = await axios.post(`${config.API_BASE_URL}/upload`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
-  
+
+      console.log("Using API base URL:", config.API_BASE_URL);
+
       console.log("Upload response:", res);
   
       if (res.data?.error?.includes("language_detection cannot be performed")) {

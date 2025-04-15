@@ -4,6 +4,7 @@ import * as DocumentPicker from "expo-document-picker";
 import axios from "axios";
 import { ResponseContext } from "./context/ResponseContext.js";
 import { useRouter } from "expo-router";
+import config from "../constants/config.json";
 
 const FileSelectorUpload = () => {
   const { responseData, setResponseData } = useContext(ResponseContext);
@@ -49,9 +50,15 @@ const FileSelectorUpload = () => {
     setError(null);
 
     try {
-      const res = await axios.post("http://127.0.0.1:5000/upload", formData, {
+      // const res = await axios.post("http://127.0.0.1:5000/upload", formData, {
+      //   headers: { "Content-Type": "multipart/form-data" },
+      // });
+
+      const res = await axios.post(`${config.API_BASE_URL}/upload`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
+
+      console.log("Using API base URL:", config.API_BASE_URL);
 
       console.log("***Received response:", res.data);
       setResponseData(res.data); // Store response globally
