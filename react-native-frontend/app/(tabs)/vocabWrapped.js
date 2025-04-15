@@ -46,26 +46,27 @@ const VocabWrapped = () => {
   const sentimentData = [
     {
       name: "Positive",
-      population: responseData.sentiment_analysis.positive || 0,
+      population: responseData.sentiment_analysis?.positive || 0,
       color: "#2ecc71",
       legendFontColor: "#2ecc71",
       legendFontSize: 14,
     },
     {
       name: "Neutral",
-      population: responseData.sentiment_analysis.neutral || 0,
+      population: responseData.sentiment_analysis?.neutral || 0,
       color: "#f1c40f",
       legendFontColor: "#f1c40f",
       legendFontSize: 14,
     },
     {
       name: "Negative",
-      population: responseData.sentiment_analysis.negative || 0,
+      population: responseData.sentiment_analysis?.negative || 0,
       color: "#e74c3c",
       legendFontColor: "#e74c3c",
       legendFontSize: 14,
     },
   ];
+  
 
   return (
     <ScrollView contentContainerStyle={enhanced.container}>

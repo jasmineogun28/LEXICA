@@ -6,6 +6,9 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import config
 import string
+import re
+from docx import Document
+from gtts import gTTS
 
 app = Flask(__name__)
 CORS(app)
@@ -70,12 +73,45 @@ def analyze_text_transcript(file_path):
         response = requests.post("https://api.assemblyai.com/v2/review", json=data, headers=headers)
 
         if response.status_code == 200:
-            return response.json()
+            analysis_result = response.json()
+            
+            # Add most frequent words using the original text
+            most_frequent_words = count_most_frequent_words(transcript_text)
+            analysis_result["most_frequent_words"] = most_frequent_words
+            analysis_result["original_text"] = transcript_text  # Optional, in case you want to return the text
+            
+            return analysis_result
         else:
             return {"error": f"Error processing text transcript: {response.json()}"}
     
     except Exception as e:
         return {"error": f"Exception occurred: {str(e)}"}
+
+def extract_text_from_file(file_path):
+    ext = os.path.splitext(file_path)[1].lower()
+    
+    if ext == '.txt':
+        with open(file_path, 'r', encoding='utf-8') as f:
+            return f.read()
+    
+    elif ext in ['.doc', '.docx']:
+        doc = Document(file_path)
+        return '\n'.join([para.text for para in doc.paragraphs])
+    
+    else:
+        raise ValueError("Unsupported file type. Use .txt, .doc, or .docx.")
+
+def convert_text_to_audio(file_path, output_audio_path='output.mp3', lang='en'):
+    text = extract_text_from_file(file_path)
+    
+    if not text.strip():
+        raise ValueError("The file appears to be empty or contains no readable text.")
+    
+    tts = gTTS(text=text, lang=lang)
+    tts.save(output_audio_path)
+    
+    print(f"Audio saved to: {output_audio_path}")
+
 
 # Function to extract highlights
 def highlights_response(results):
@@ -83,55 +119,22 @@ def highlights_response(results):
 
 # Function to analyze sentiment
 def sentiment_response(results):
-    sentiment_counts = defaultdict(lambda: {"POSITIVE": 0, "NEUTRAL": 0, "NEGATIVE": 0})
-    
-    for item in results:
-        speaker = getattr(item, "speaker", "Unknown")  # Use getattr to safely get the speaker
-        sentiment = str(item.sentiment).split(".")[-1].upper()  # Extract sentiment label
-        sentiment_counts[speaker][sentiment] += 1
+    overall_counts = {"positive": 0, "neutral": 0, "negative": 0}
 
-    return sentiment_counts
+    for item in results:
+        sentiment = str(item.sentiment).split(".")[-1].upper()
+        if sentiment == "POSITIVE":
+            overall_counts["positive"] += 1
+        elif sentiment == "NEUTRAL":
+            overall_counts["neutral"] += 1
+        elif sentiment == "NEGATIVE":
+            overall_counts["negative"] += 1
+
+    return overall_counts
 
 # Function to extract confidence measure
 def confidence_measure(results):
     return {"confidence": results}
-
-# Function to count disfluencies
-# def disfluency_count(transcript):
-#     disfluency_map = {
-#         "uh": ["uh"],
-#         "um": ["um"],
-#         "you know": ["you know"],
-#         "like": ["like"],
-#         "hmm": ["hmm"],
-#         "mhm": ["mhm"],
-#         "uh-huh": ["uh-huh"],
-#         "ah": ["ah"],
-#         "huh": ["huh"],
-#         "hm": ["hm"],
-#         "m": ["m"],
-#         "thing": ["thing"],
-#     }
-
-#     speaker_counts = {}
-
-#     # Ensure transcript.utterances exists
-#     utterances = getattr(transcript, "utterances", [])
-
-#     for utterance in utterances:
-#         speaker = utterance.speaker if utterance.speaker else "Unknown"
-#         words = utterance.text.lower().split()
-
-#         if speaker not in speaker_counts:
-#             speaker_counts[speaker] = {word: 0 for word in disfluency_map}
-
-#         for word in words:
-#             for disfluency, variations in disfluency_map.items():
-#                 if word in variations:
-#                     speaker_counts[speaker][disfluency] += 1
-
-#     return speaker_counts
-import re
 
 def disfluency_count(transcript):
     disfluency_map = {
@@ -181,6 +184,74 @@ def disfluency_count(transcript):
 
     return disfluency_counts
 
+def disfluency_count_from_text(text):
+    disfluency_map = {
+        "uh": ["uh"],
+        "um": ["um"],
+        "you know": ["you know"],
+        "like": ["like"],
+        "hmm": ["hmm"],
+        "mhm": ["mhm"],
+        "uh-huh": ["uh-huh"],
+        "ah": ["ah"],
+        "huh": ["huh"],
+        "hm": ["hm"],
+        "m": ["m"],
+        "thing": ["thing"],
+    }
+
+    disfluency_counts = {key: 0 for key in disfluency_map}
+
+    text = re.sub(r"[^\w\s]", "", text.lower())
+
+    for disfluency, variations in disfluency_map.items():
+        for variation in variations:
+            disfluency_counts[disfluency] += text.count(variation)
+
+    return disfluency_counts
+
+def analyze_text_transcript(file_path):
+    try:
+        with open(file_path, "r", encoding="utf-8") as f:
+            transcript_text = f.read()
+
+        API_KEY = aai.settings.api_key
+        headers = {"authorization": API_KEY, "content-type": "application/json"}
+
+        data = {
+            "text": transcript_text,
+            "sentiment_analysis": True,
+            "entity_detection": True,
+            "iab_categories": True,
+            "auto_highlights": True,
+            "disfluencies": True,
+        }
+
+        response = requests.post("https://api.assemblyai.com/v2/review", json=data, headers=headers)
+
+        if response.status_code == 200:
+            result = response.json()
+
+            return {
+                "status": "success",
+                "message": "Text file processed successfully",
+                "text": transcript_text,
+                "summary": result.get("summary", None),
+                "auto_highlights": [
+                    {"text": item["text"], "count": item["count"]}
+                    for item in result.get("auto_highlights_result", [])
+                ],
+                "sentiment_analysis": result.get("sentiment_analysis_results", []),
+                "confidence": {"confidence": None},  # No confidence score from text
+                "disfluencies": disfluency_count_from_text(transcript_text),
+                "most_frequent_words": count_most_frequent_words(transcript_text),
+            }
+        else:
+            return {"error": f"Error processing text transcript: {response.json()}"}
+
+    except Exception as e:
+        return {"error": f"Exception occurred: {str(e)}"}
+
 # Function to count the most frequent words
 def count_most_frequent_words(transcript_text):
     # Remove punctuation and convert to lowercase
@@ -208,8 +279,6 @@ def process_file(file_path):
         if transcript.status == aai.TranscriptStatus.error:
             return {"error": transcript.error}
 
-        most_frequent_words = count_most_frequent_words(transcript.text)  # Add this line
-
         return {
             "status": "success",
             "message": "File processed successfully",
@@ -219,20 +288,18 @@ def process_file(file_path):
             "sentiment_analysis": sentiment_response(transcript.sentiment_analysis),
             "confidence": confidence_measure(transcript.confidence),
             "disfluencies": disfluency_count(transcript),
-            "most_frequent_words": most_frequent_words,  # Add this key to the response
+            "most_frequent_words": count_most_frequent_words(transcript.text),
         }
 
     elif file_type == "text":
-        response = analyze_text_transcript(file_path)
-
-        if "error" in response:
-            return {"error": response["error"]}
-
-        most_frequent_words = count_most_frequent_words(response['text'])  # Add this line
-
-        response["most_frequent_words"] = most_frequent_words  # Add the top 10 words
-
-        return response
+        # Convert text to audio first
+        audio_output_path = os.path.splitext(file_path)[0] + "_converted.mp3"
+        try:
+            convert_text_to_audio(file_path, output_audio_path=audio_output_path)
+            # Then process the generated audio
+            return process_file(audio_output_path)
+        except Exception as e:
+            return {"error": f"Error converting text to audio: {str(e)}"}
 
     return {"error": "Unsupported file type"}
 

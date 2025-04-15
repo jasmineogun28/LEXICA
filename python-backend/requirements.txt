@@ -3,3 +3,5 @@ gunicorn
 assemblyai
 requests
 flask-cors
+python-docx
+gTTS
