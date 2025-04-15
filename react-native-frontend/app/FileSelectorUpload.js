@@ -50,13 +50,13 @@ const FileSelectorUpload = () => {
     setError(null);
 
     try {
-      // const res = await axios.post("http://127.0.0.1:5000/upload", formData, {
-      //   headers: { "Content-Type": "multipart/form-data" },
-      // });
-
-      const res = await axios.post(`${config.API_BASE_URL}/upload`, formData, {
+      const res = await axios.post("https://lexica-3tmd.onrender.com/upload", formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
+
+      // const res = await axios.post(`${config.API_BASE_URL}/upload`, formData, {
+      //   headers: { "Content-Type": "multipart/form-data" },
+      // });
 
       console.log("Using API base URL:", config.API_BASE_URL);
 
