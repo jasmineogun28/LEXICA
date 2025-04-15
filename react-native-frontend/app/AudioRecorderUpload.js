@@ -4,7 +4,7 @@ import { ResponseContext } from "./context/ResponseContext";
 import { Platform, View, Text, Button, StyleSheet } from "react-native";
 import Svg, { Circle } from "react-native-svg";
 import { useRouter } from "expo-router";
-import config from "../constants/config.json";
+import config from "../constants/config.js";
 
 const MAX_RECORD_TIME = 60;
 
@@ -122,13 +122,13 @@ const AudioRecorderUpload = ({ selectedTopic, isRecording, setIsRecording }) => 
     setError(null);
   
     try {
-      const res = await axios.post("https://lexica-3tmd.onrender.com/upload", formData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-
-      // const res = await axios.post(`${config.API_BASE_URL}/upload`, formData, {
+      // const res = await axios.post("https://lexica-3tmd.onrender.com/upload", formData, {
       //   headers: { "Content-Type": "multipart/form-data" },
       // });
+
+      const res = await axios.post(`${config.API_BASE_URL}/upload`, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
 
       console.log("Using API base URL:", config.API_BASE_URL);
 
