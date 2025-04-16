@@ -31,8 +31,8 @@ export default function Record() {
     <View style={styles.container}>
       <View style={styles.buttonRow}>
         <Text style={styles.title}>Record an Audio File</Text>
-        <Text style={{ fontSize: 18, fontWeight: '600', marginBottom: 8 }}>🗣️ Topic:</Text>
-        <Text style={{ fontSize: 16, textAlign: 'center', marginBottom: 12 }}>
+        <Text style={{ fontSize: 30, fontWeight: '600', marginBottom: 8 , color: '#023047'}}>🗣️ Topic:</Text>
+        <Text style={{ fontSize: 30, textAlign: 'center', marginBottom: 12 , color: '#023047'}}>
           {topic || "Tap to generate a topic!"}
         </Text>
 
@@ -46,7 +46,7 @@ export default function Record() {
             marginBottom: 20,
           }}
         >
-          <Text style={{ color: "#fff", fontWeight: "bold" }}>
+          <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 20 }}>
             {isRecording ? "Recording..." : "🔄 Shuffle Topic"}
           </Text>
         </Pressable>
@@ -62,3 +62,4 @@ export default function Record() {
     </View>
   );
 }
+

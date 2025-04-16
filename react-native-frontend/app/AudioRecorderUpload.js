@@ -1,7 +1,14 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext, useEffect, useRef } from "react";
 import axios from "axios";
 import { ResponseContext } from "./context/ResponseContext";
-import { Platform, View, Text, Button, StyleSheet } from "react-native";
+import {
+  Platform,
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Animated,
+} from "react-native";
 import Svg, { Circle } from "react-native-svg";
 import { useRouter } from "expo-router";
 import config from "../constants/config.js";
@@ -17,6 +24,8 @@ const AudioRecorderUpload = ({ selectedTopic, isRecording, setIsRecording }) => 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [uploaded, setUploaded] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const progressAnim = useRef(new Animated.Value(0)).current;
   const router = useRouter();
 
   useEffect(() => {
@@ -34,12 +43,6 @@ const AudioRecorderUpload = ({ selectedTopic, isRecording, setIsRecording }) => 
       return () => clearInterval(id);
     }
   }, [recording]);
-
-  useEffect(() => {
-    if (responseData) {
-      console.log("Updated response data:", responseData);
-    }
-  }, [responseData]);
 
   const resetTimer = () => {
     if (intervalId) clearInterval(intervalId);
@@ -120,22 +123,49 @@ const AudioRecorderUpload = ({ selectedTopic, isRecording, setIsRecording }) => 
   
     setLoading(true);
     setError(null);
+    setProgress(0);
+    progressAnim.setValue(0);
   
     try {
-      // const res = await axios.post("http://127.0.0.1:5000/upload", formData, {
-      //   headers: { "Content-Type": "multipart/form-data" },
-      // });
-
       const res = await axios.post(`${config.API_BASE_URL}/upload`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
-      });
+        onUploadProgress: (progressEvent) => {
+          const percent = Math.round(
+            (progressEvent.loaded * 100) / progressEvent.total
+          );
   
-      console.log("Upload response:", res);
+          // Set progress to 95% during upload
+          if (percent < 95) {
+            setProgress(percent);
+            Animated.timing(progressAnim, {
+              toValue: percent,
+              duration: 300,
+              useNativeDriver: false,
+            }).start();
+          } else {
+            // Hold progress at 95% until upload is complete
+            setProgress(95);
+            Animated.timing(progressAnim, {
+              toValue: 95,
+              duration: 300,
+              useNativeDriver: false,
+            }).start();
+          }
+        },
+      });
   
       if (res.data?.error?.includes("language_detection cannot be performed")) {
         setError("No spoken audio detected. Please try recording again.");
         return;
       }
+  
+      // Once the upload is complete, jump to 100%
+      setProgress(100);
+      Animated.timing(progressAnim, {
+        toValue: 100,
+        duration: 300,
+        useNativeDriver: false,
+      }).start();
   
       setResponseData(res.data);
       setUploaded(true);
@@ -146,6 +176,7 @@ const AudioRecorderUpload = ({ selectedTopic, isRecording, setIsRecording }) => 
       setLoading(false);
     }
   };
+  
   
 
   const handleDownload = () => {
@@ -188,39 +219,68 @@ const AudioRecorderUpload = ({ selectedTopic, isRecording, setIsRecording }) => 
 
       {error && <Text style={styles.errorText}>{error}</Text>}
 
-      <View style={{ flexDirection: "row", justifyContent: "space-between", width: "100%", marginTop: 20 }}>
-        {/* Left Column */}
-        <View style={{ flex: 1, marginRight: 10 }}>
-          <Button
-            title={recording ? "Stop Recording" : "Start Recording"}
-            onPress={recording ? stopRecording : startRecording}
-          />
-          <View style={{ marginTop: 10 }}>
-            <Button
-              title="Download Recording"
-              onPress={handleDownload}
-              disabled={!audioFile}
+      <TouchableOpacity
+        style={styles.button}
+        onPress={recording ? stopRecording : startRecording}
+      >
+        <Text style={styles.buttonText}>
+          {recording ? "Stop Recording" : "Start Recording"}
+        </Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={styles.button}
+        onPress={handleDownload}
+        disabled={!audioFile}
+      >
+        <Text style={styles.buttonText}>Download Recording</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity
+        style={[styles.button, { backgroundColor: loading ? "#aaa" : "#023047" }]}
+        onPress={handleUpload}
+        disabled={!audioFile || loading}
+      >
+        <Text style={styles.buttonText}>Upload File</Text>
+      </TouchableOpacity>
+
+      {loading && (
+        <View style={{ marginTop: 10, alignItems: "center" }}>
+          <Text style={{ color: "#023047", fontWeight: "bold" }}>
+            Uploading: {progress}%
+          </Text>
+          <View
+            style={{
+              height: 10,
+              width: 200,
+              backgroundColor: "#e0e0e0",
+              borderRadius: 5,
+              overflow: "hidden",
+              marginTop: 5,
+            }}
+          >
+            <Animated.View
+              style={{
+                height: "100%",
+                backgroundColor: "#2196F3",
+                width: progressAnim.interpolate({
+                  inputRange: [0, 100],
+                  outputRange: ["0%", "100%"],
+                }),
+              }}
             />
           </View>
         </View>
+      )}
 
-        {/* Right Column */}
-        <View style={{ flex: 1, marginLeft: 10 }}>
-          <Button
-            title="Upload File"
-            onPress={handleUpload}
-            disabled={!audioFile || loading}
-          />
-          {uploaded && (
-            <View style={{ marginTop: 10 }}>
-              <Button
-                title="Next"
-                onPress={() => router.push("/(tabs)/vocabWrapped")}
-              />
-            </View>
-          )}
-        </View>
-      </View>
+      {uploaded && (
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => router.push("/(tabs)/vocabWrapped")}
+        >
+          <Text style={styles.buttonText}>Next</Text>
+        </TouchableOpacity>
+      )}
     </View>
   );
 };
@@ -231,14 +291,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     alignItems: "center",
   },
-  title: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 20,
-  },
   timerText: {
-    fontSize: 16,
+    fontSize: 25,
     marginBottom: 10,
+    fontWeight: "bold",
+    color: "#023047",
   },
   timerContainer: {
     marginBottom: 20,
@@ -246,10 +303,26 @@ const styles = StyleSheet.create({
   errorText: {
     color: "red",
     marginTop: 15,
+    marginBottom: 10,
   },
-  fileText: {
-    marginTop: 10,
-    fontSize: 16,
+  button: {
+    backgroundColor: "#023047",
+    paddingVertical: 15,
+    paddingHorizontal: 40,
+    borderRadius: 30,
+    marginTop: 12,
+    width: "80%",
+    alignItems: "center",
+    elevation: 4,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "bold",
+    fontSize: 20,
   },
 });
 

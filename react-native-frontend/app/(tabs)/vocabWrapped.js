@@ -1,14 +1,5 @@
 import React, { useContext, useEffect } from "react";
-import {
-  ScrollView,
-  View,
-  Text,
-  Dimensions,
-  Button,
-  StyleSheet,
-  TouchableOpacity,
-  Alert,
-} from "react-native";
+import {ScrollView, View, Text, Dimensions, Button, StyleSheet, TouchableOpacity, Alert,} from "react-native";
 import { ResponseContext } from "../context/ResponseContext";
 import styles from "../css/_styles";
 import { useRouter } from "expo-router";

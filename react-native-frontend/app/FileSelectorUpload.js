@@ -1,5 +1,13 @@
-import React, { useState, useContext, useEffect } from "react";
-import { View, Text, Button, StyleSheet, Platform, TouchableOpacity } from "react-native";
+import React, { useState, useContext, useEffect, useRef } from "react";
+import {
+  View,
+  Text,
+  Button,
+  StyleSheet,
+  Platform,
+  TouchableOpacity,
+  Animated,
+} from "react-native";
 import * as DocumentPicker from "expo-document-picker";
 import axios from "axios";
 import { ResponseContext } from "./context/ResponseContext.js";
@@ -12,12 +20,10 @@ const FileSelectorUpload = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [uploading, setUploading] = useState(false); 
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [showNextButton, setShowNextButton] = useState(false);
+  const progressAnim = useRef(new Animated.Value(0)).current;
   const router = useRouter();
-
-  useEffect(() => {
-    console.log("Uploading state changed:", uploading);
-  }, [uploading]);
 
   const handleFileChange = (event) => {
     setFile(event.target.files[0]);
@@ -30,7 +36,7 @@ const FileSelectorUpload = () => {
       return;
     }
 
-    if (Platform.OS === "ios" && !selectedFile) {
+    if (Platform.OS !== "web" && !selectedFile) {
       setError("Please select a file first!");
       return;
     }
@@ -42,28 +48,45 @@ const FileSelectorUpload = () => {
       formData.append("file", {
         uri: selectedFile.uri,
         name: selectedFile.name,
-        type: selectedFile.mimeType,
+        type: selectedFile.mimeType || "application/octet-stream",
       });
     }
 
     setLoading(true);
     setError(null);
+    setUploadProgress(0);
+    setShowNextButton(false);
+
+    const progressInterval = setInterval(() => {
+      setUploadProgress((prev) => {
+        const next = Math.min(prev + 5, 95);
+        Animated.timing(progressAnim, {
+          toValue: next,
+          duration: 200,
+          useNativeDriver: false,
+        }).start();
+        return next;
+      });
+    }, 300);
 
     try {
-      // const res = await axios.post("http://127.0.0.1:5000/upload", formData, {
-      //   headers: { "Content-Type": "multipart/form-data" },
-      // });
-
       const res = await axios.post(`${config.API_BASE_URL}/upload`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      console.log("***Received response:", res.data);
-      setResponseData(res.data); // Store response globally
-      setUploading(true); // Set uploading to true when upload is complete
-      console.log("Uploading state set to true");
-      router.push("/(tabs)/vocabWrapped"); 
+      clearInterval(progressInterval);
+      setUploadProgress(100);
+      Animated.timing(progressAnim, {
+        toValue: 100,
+        duration: 300,
+        useNativeDriver: false,
+      }).start(() => {
+        setShowNextButton(true); // Only show next button after progress finishes
+      });
+
+      setResponseData(res.data);
     } catch (err) {
+      clearInterval(progressInterval);
       setError("Error uploading file. Please try again.");
       console.error(err);
     } finally {
@@ -72,14 +95,13 @@ const FileSelectorUpload = () => {
   };
 
   const handleNext = () => {
-    console.log("Navigating to vocabWrapped page");
-    router.push("/(tabs)/vocabWrapped"); 
+    router.push("/(tabs)/vocabWrapped");
   };
 
   const selectFileIOS = async () => {
     try {
       const result = await DocumentPicker.getDocumentAsync({
-        type: "audio/*",
+        type: "*/*",
         copyToCacheDirectory: true,
       });
 
@@ -101,6 +123,21 @@ const FileSelectorUpload = () => {
           {loading ? "Uploading..." : "Upload"}
         </button>
         {error && <p style={{ color: "red" }}>{error}</p>}
+        <div style={{ width: "100%", height: 20, backgroundColor: "#eee", marginTop: 10 }}>
+          <div
+            style={{
+              height: "100%",
+              width: `${uploadProgress}%`,
+              backgroundColor: "#2196F3",
+              transition: "width 0.3s ease",
+            }}
+          />
+        </div>
+        {showNextButton && (
+          <button onClick={handleNext} style={{ marginTop: 10 }}>
+            Next
+          </button>
+        )}
       </div>
     );
   }
@@ -108,7 +145,7 @@ const FileSelectorUpload = () => {
   return (
     <View style={styles.container}>
       <Button
-        title="Select Audio File"
+        title="Select Audio/Text File"
         onPress={selectFileIOS}
         disabled={loading}
       />
@@ -120,17 +157,39 @@ const FileSelectorUpload = () => {
       <Button
         title={loading ? "Uploading..." : "Upload"}
         onPress={handleUpload}
-        disabled={loading || !selectedFile}
+        disabled={loading || (!selectedFile && Platform.OS !== "web")}
       />
 
-    <Button
-        title={loading ? "Wait..." : "Click to go to Next page"}
-        onPress={handleNext}
-        disabled={loading || !selectedFile}
-      />
+      <View style={styles.progressBar}>
+        <Animated.View
+          style={[
+            styles.progress,
+            {
+              width: progressAnim.interpolate({
+                inputRange: [0, 100],
+                outputRange: ["0%", "100%"],
+              }),
+            },
+          ]}
+        />
+      </View>
 
       {error && <Text style={styles.errorText}>{error}</Text>}
-      
+
+      {/* {showNextButton && (
+        <TouchableOpacity onPress={handleNext} style={styles.nextButton}>
+          <Text style={styles.nextButtonText}>Next</Text>
+        </TouchableOpacity>
+      )} */}
+
+      {showNextButton && (
+        <View style={{ marginTop: 30, width: "100%", alignItems: "center" }}>
+          <TouchableOpacity onPress={handleNext} style={styles.nextButton}>
+            <Text style={styles.nextButtonText}>Next</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
     </View>
   );
 };
@@ -148,17 +207,51 @@ const styles = StyleSheet.create({
     color: "red",
     marginTop: 10,
   },
-  button: {
-    backgroundColor: "green",
-    padding: 10,
-    borderRadius: 5,
+  progressBar: {
+    width: "100%",
+    height: 20,
+    backgroundColor: "#eee",
+    borderRadius: 10,
+    overflow: "hidden",
+    marginTop: 20,
+  },
+  progress: {
+    height: "100%",
+    backgroundColor: "#2196F3",
+  },
+  // nextButton: {
+  //   marginTop: 20,
+  //   backgroundColor: "#2196F3",
+  //   paddingVertical: 12,
+  //   paddingHorizontal: 25,
+  //   borderRadius: 8,
+  //   alignItems: "center",
+  // },
+  // nextButtonText: {
+  //   color: "#fff",
+  //   fontSize: 25,
+  //   fontWeight: "bold",
+  // },
+  nextButton: {
+    backgroundColor: "#023047",
+    paddingVertical: 12,
+    paddingHorizontal: 32,
+    borderRadius: 25,
+    marginTop: 20,
+    borderWidth: 1,
+    borderColor: "#023047",
+    cursor: "pointer", // Web only
     alignItems: "center",
+    justifyContent: "center",
   },
-  buttonText: {
-    color: "white",
-    fontSize: 16,
-    fontWeight: "bold",
+  
+  nextButtonText: {
+    fontSize: 20,
+    fontWeight: "600",
+    color: "#fff",
+    textAlign: "center",
   },
+  
 });
 
 export default FileSelectorUpload;
