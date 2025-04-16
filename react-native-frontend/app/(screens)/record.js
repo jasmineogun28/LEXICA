@@ -1,6 +1,14 @@
 import React, { useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, Pressable } from 'react-native';
+import {
+  StyleSheet,
+  Text,
+  View,
+  Pressable,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform
+} from 'react-native';
 import styles from '../css/_styles';
 import AudioRecorderUpload from '../AudioRecorderUpload';
 import { ResponseProvider } from '../context/ResponseContext';
@@ -28,42 +36,48 @@ export default function Record() {
   };
 
   return (
-    <View style={styles.container}>
-      <View>
-        <Text style={styles.title}>Record an Audio File</Text>
-      </View>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      style={{ flex: 1 }}
+    >
+      <ScrollView
+        contentContainerStyle={{ flexGrow: 1 }}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View style={[styles.container, { paddingBottom: 40 }]}>
+          <Text style={styles.title}>Record an Audio File</Text>
 
-      <View style={styles.buttonRow}>
-        {/* <Text style={styles.title}>Record an Audio File</Text> */}
-        <Text style={{ fontSize: 30, fontWeight: '600', marginBottom: 8 , color: '#023047'}}>🗣️ Topic:</Text>
-        <Text style={{ fontSize: 30, textAlign: 'center', marginBottom: 12 , color: '#023047'}}>
-          {topic || "Tap to generate a topic!"}
-        </Text>
+          <View style={styles.buttonRow}>
+            <Text style={{ fontSize: 30, fontWeight: '600', marginBottom: 8, color: '#023047' }}>🗣️ Topic:</Text>
+            <Text style={{ fontSize: 30, textAlign: 'center', marginBottom: 12, color: '#023047' }}>
+              {topic || "Tap to generate a topic!"}
+            </Text>
 
-        <Pressable
-          onPress={getRandomTopic}
-          disabled={isRecording}
-          style={{
-            backgroundColor: isRecording ? "#ccc" : "#4CAF50",
-            padding: 10,
-            borderRadius: 10,
-            marginBottom: 20,
-          }}
-        >
-          <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 20 }}>
-            {isRecording ? "Recording..." : "🔄 Shuffle Topic"}
-          </Text>
-        </Pressable>
+            <Pressable
+              onPress={getRandomTopic}
+              disabled={isRecording}
+              style={{
+                backgroundColor: isRecording ? "#ccc" : "#4CAF50",
+                padding: 10,
+                borderRadius: 10,
+                marginBottom: 20,
+              }}
+            >
+              <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 20 }}>
+                {isRecording ? "Recording..." : "🔄 Shuffle Topic"}
+              </Text>
+            </Pressable>
 
-        <AudioRecorderUpload
-          selectedTopic={topic}
-          isRecording={isRecording}
-          setIsRecording={setIsRecording}
-        />
-      </View>
+            <AudioRecorderUpload
+              selectedTopic={topic}
+              isRecording={isRecording}
+              setIsRecording={setIsRecording}
+            />
+          </View>
 
-      <StatusBar style="auto" />
-    </View>
+          <StatusBar style="auto" />
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
-
