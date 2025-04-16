@@ -11,6 +11,7 @@ export default function TabNavigator() {
             backgroundColor: '#023047',
           },
           headerShadowVisible: false,
+          headerShown: false,
           headerTintColor: '#fff',
           tabBarStyle: {
             backgroundColor: '#023047',

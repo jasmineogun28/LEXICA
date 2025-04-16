@@ -31,7 +31,7 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#023047',
     textAlign: 'center',
-    marginBottom: 20,
+    marginBottom: 40,
   },
   subtitle: {
     fontSize: 30,

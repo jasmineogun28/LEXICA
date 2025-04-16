@@ -7,6 +7,7 @@ const styles = StyleSheet.create({
       alignItems: 'center',
       justifyContent: 'center', 
       paddingTop: 80, 
+      paddingBottom: 20,
     },
     text: {
       fontSize: 30,
@@ -15,7 +16,7 @@ const styles = StyleSheet.create({
       marginBottom: 10, 
     },
     title: {
-      fontSize: 50,
+      fontSize: 40,
       fontWeight: 'bold',
       marginBottom: 20,
       color: '#023047',
