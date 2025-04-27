@@ -1,50 +1,51 @@
-# Welcome to your Expo app 👋
+# Welcome to Lexica 👋📖🗣️
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Lexica is a web application that analyzes users' speech or uploaded text/audio files, providing personalised feedback on vocabulary usage, filler words, and sentiment.
+The frontend was created using React Native with [Expo](https://expo.dev), and the backend using Python with [Flask API](https://flask.palletsprojects.com/en/stable/).
 
-## Get started
+## Running the app locally
+You will need two separate terminals.
 
-1. Install dependencies
+1. Start the Flask Backend
+- Navigate to the [`python-backend`] directory.
+
+- Install the required Python packages.
+   ```bash
+    pip intall -r requirements.txt
+   ```
+
+- Start the Flask API server.
+   ```bash
+    python transcribeAnalyse.py
+   ```
+
+- Ensure that the backend URL (e.g., http://localhost:5000/upload) is correctly set inside the frontend files:
+   - [`FileSelectorUpload.js`]
+   - [`AudioRecorderUpload.js`]
+
+
+2. Start the React Native Frontend
+- Navigate to the [`react-native-frontend`] directory.
+
+- Install the expo dependencies
 
    ```bash
    npm install
    ```
-
-2. Start the app
-
+- Start the app 
    ```bash
     npx expo start
    ```
+- In the terminal, type [`w`] to open the web version in your browser.
 
-In the output, you'll find options to open the app in a
+## Viewing the app online
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+The web app is available online @ [Lexica]( https://lexica-vt.vercel.app/)
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+- Frontend deployed using [Vercel](https://vercel.com/home)
+- Backend deployed using [Render](https://render.com/docs/web-services).
 
-## Get a fresh project
+## License
 
-When you're ready, run:
-
-```bash
-npm run reset-project
-```
-
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
-
-## Join the community
-
-Join our community of developers creating universal apps.
-
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+This project is licensed under "All Rights Reserved."  
+Unauthorized use, copying, or distribution of the code and materials is not permitted without explicit permission from the author.

@@ -15,6 +15,12 @@ const IntroScreen = () => {
         {'\n'}
         You'll be able to upload short and long-form audio {'\n'}and text and get some
         feedback on your speech.
+
+        To give you meaningful feedback, Lexica uses a couple of trusted tools behind the scenes:
+        • AssemblyAI – for transcription, sentiment, and filler word analysis
+        • Google Text-to-Speech – to convert text into audio for consistent processing
+
+        Your files aren’t stored permanently, and we don’t keep personal data. That said, since these tools are third-party services, we recommend avoiding sensitive info when uploading.
       </Text>
 
       <TouchableOpacity
