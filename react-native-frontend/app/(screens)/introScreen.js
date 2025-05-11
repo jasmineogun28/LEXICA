@@ -1,78 +1,111 @@
 import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from "react-native";
 import { useRouter } from "expo-router";
 
 const IntroScreen = () => {
   const router = useRouter();
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Welcome to Lexica!</Text>
-      <Text style={styles.text}>
-        The personalized vocabulary tool, designed {'\n'} to help you improve your
-        vocabulary and language skills.
-        {'\n'}
-        {'\n'}
-        You'll be able to upload short and long-form audio {'\n'}and text and get some
-        feedback on your speech.
+    <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <View style={styles.card}>
+        <Text style={styles.title}>Welcome to Lexica!</Text>
 
-        To give you meaningful feedback, Lexica uses a couple of trusted tools behind the scenes:
-        • AssemblyAI – for transcription, sentiment, and filler word analysis
-        • Google Text-to-Speech – to convert text into audio for consistent processing
+      <Text style={styles.subheading}>Ready to Level Up Your Vocabulary?</Text>
 
-        Your files aren’t stored permanently, and we don’t keep personal data. That said, since these tools are third-party services, we recommend avoiding sensitive info when uploading.
+      <Text style={styles.bodyText}>
+        Lexica is your personal language trainer, crafted to help you improve your vocabulary and language skills through personalized feedback.
+      </Text>
+
+      <Text style={styles.sectionTitle}>🎯 What You Can Do:</Text>
+      <Text style={styles.bodyText}>
+        • Record a new audio{'\n'}
+        • Upload audio or text files{'\n'}
+        • Get instant feedback on your speech clarity, filler words, and tone{'\n'}
+      </Text>
+
+      <Text style={styles.sectionTitle}>🛠️ External Tools Utilised:</Text>
+      <Text style={styles.bodyText}>
+        • <Text style={styles.bold}>AssemblyAI</Text> {'\n'}
+        • <Text style={styles.bold}>Google TTS</Text>
+      </Text>
+
+      <Text style={styles.note}>
+        ⚠️ Your files are not stored permanently, and no personal data is kept. However, it is advised to avoid uploading sensitive information where possible.
       </Text>
 
       <TouchableOpacity
         style={styles.button}
         onPress={() => router.push("/(screens)/options")}
       >
-        <Text style={styles.buttonText}>LET'S GET STARTED!</Text>
+        <Text style={styles.buttonText}>LET’S GET STARTED</Text>
       </TouchableOpacity>
-    </View>
+      </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
+  scrollContainer: {
+    flexGrow: 1,
     justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#c0eef0",
-    paddingHorizontal: 20,
+    padding: 20,
+    backgroundColor: "#e0f7fa",
+  },
+  card: {
+    backgroundColor: "#ffffff",
+    borderRadius: 20,
+    padding: 25,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.1,
+    shadowRadius: 10,
+    elevation: 6,
   },
   title: {
-    fontSize: 60,
+    fontSize: 36,
     fontWeight: "bold",
     color: "#023047",
     textAlign: "center",
-    marginBottom: 20,
-    fontFamily: "sans-serif",
+    marginBottom: 10,
   },
-  text: {
-    fontSize: 30,
-    color: "#023047",
+  subheading: {
+    fontSize: 20,
     textAlign: "center",
-    marginBottom: 15,
-    fontFamily: "sans-serif",
+    color: "#555",
+    marginBottom: 20,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    color: "#014f86",
+    marginTop: 20,
+    marginBottom: 8,
+  },
+  bodyText: {
+    fontSize: 16,
+    color: "#333",
+    lineHeight: 24,
+  },
+  bold: {
+    fontWeight: "bold",
+  },
+  note: {
+    fontSize: 14,
+    color: "#9e9e9e",
+    fontStyle: "italic",
+    marginTop: 20,
   },
   button: {
     backgroundColor: "#023047",
-    paddingVertical: 15,
-    paddingHorizontal: 40,
+    paddingVertical: 14,
     borderRadius: 30,
-    elevation: 4,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    marginTop: 20,
+    marginTop: 30,
+    alignItems: "center",
   },
   buttonText: {
-    fontSize: 30,
-    fontWeight: "bold",
     color: "#fff",
-    textAlign: "center",
+    fontSize: 18,
+    fontWeight: "600",
   },
 });
 

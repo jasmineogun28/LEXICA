@@ -1,12 +1,27 @@
 import React, { useContext, useEffect } from "react";
-import {ScrollView, View, Text, Dimensions, Button, StyleSheet, TouchableOpacity, Alert,} from "react-native";
+import {
+  ScrollView,
+  View,
+  Text,
+  Dimensions,
+  Button,
+  StyleSheet,
+  TouchableOpacity,
+  Alert,
+} from "react-native";
 import { ResponseContext } from "../context/ResponseContext";
 import styles from "../css/_styles";
 import { useRouter } from "expo-router";
-import { BarChart, PieChart } from "react-native-chart-kit";
+import { PieChart } from "react-native-chart-kit";
 import * as Clipboard from "expo-clipboard";
+import VictoryBarChart from "../VictoryBarChart";
 
+// Get screen width
 const screenWidth = Dimensions.get("window").width;
+
+// Adjust size for small, medium, and large screens
+const isSmallScreen = screenWidth < 380;
+const isMediumScreen = screenWidth < 768;
 
 const VocabWrapped = () => {
   const router = useRouter();
@@ -24,15 +39,6 @@ const VocabWrapped = () => {
       </View>
     );
   }
-
-  const barData = {
-    labels: responseData.most_frequent_words.slice(0, 10).map((item) => item[0]),
-    datasets: [
-      {
-        data: responseData.most_frequent_words.slice(0, 10).map((item) => item[1]),
-      },
-    ],
-  };
 
   const sentimentData = [
     {
@@ -57,7 +63,9 @@ const VocabWrapped = () => {
       legendFontSize: 14,
     },
   ];
-  
+
+  const barLabels = responseData.most_frequent_words.slice(0, 10).map((item) => item[0]);
+  const barValues = responseData.most_frequent_words.slice(0, 10).map((item) => item[1]);
 
   return (
     <ScrollView contentContainerStyle={enhanced.container}>
@@ -65,31 +73,22 @@ const VocabWrapped = () => {
 
       <View style={enhanced.card}>
         <Text style={enhanced.cardTitle}>Top 10 Most Frequent Words</Text>
-        <BarChart
-          data={barData}
-          width={screenWidth * 0.9}
-          height={220}
-          fromZero
-          chartConfig={{
-            backgroundColor: "#ffffff",
-            backgroundGradientFrom: "#ffffff",
-            backgroundGradientTo: "#ffffff",
-            decimalPlaces: 0,
-            color: () => "#1d3557",
-            labelColor: () => "#1d3557",
-            barPercentage: 0.7,
-          }}
-          verticalLabelRotation={30}
-          style={{ borderRadius: 12 }}
-        />
+        <ScrollView horizontal={isSmallScreen} showsHorizontalScrollIndicator={isSmallScreen}>
+          <VictoryBarChart
+            barLabels={barLabels}
+            barValues={barValues}
+            chartWidth={isSmallScreen ? screenWidth * 1.5 : isMediumScreen ? screenWidth * 0.8 : screenWidth * 0.6}
+            chartHeight={isSmallScreen ? 300 : isMediumScreen ? 250 : 200}
+          />
+        </ScrollView>
       </View>
 
       <View style={enhanced.card}>
         <Text style={enhanced.cardTitle}>Sentiment Analysis</Text>
         <PieChart
           data={sentimentData}
-          width={screenWidth * 0.9}
-          height={200}
+          width={isSmallScreen ? screenWidth * 0.85 : isMediumScreen ? screenWidth * 0.75 : screenWidth * 0.55}
+          height={isSmallScreen ? 180 : isMediumScreen ? 220 : 300}
           chartConfig={{
             color: () => "#000",
           }}
@@ -105,18 +104,26 @@ const VocabWrapped = () => {
 
       <View style={enhanced.card}>
         <Text style={enhanced.cardTitle}>Highlights</Text>
-        {responseData.auto_highlights.map((item, index) => (
-          <Text key={index} style={enhanced.textLine}>
-            "{item.text}" (Count: {item.count})
-          </Text>
+        {responseData.auto_highlights
+          .sort((a, b) => b.count - a.count)
+          .slice(0, 10)
+          .map((item, index) => (
+            <Text key={index} style={enhanced.textLine}>
+              "{item.text}" (Count: {item.count})
+            </Text>
         ))}
       </View>
 
       <View style={enhanced.card}>
-        <Text style={enhanced.cardTitle}>Disfluencies</Text>
-        <Text style={enhanced.textBlock}>
-          {JSON.stringify(responseData.disfluencies, null, 2)}
-        </Text>
+        <Text style={enhanced.cardTitle}>Filler Words (Disfluencies)</Text>
+        {Object.entries(responseData.disfluencies)
+          .filter(([_, value]) => value > 0)
+          .map(([key, value]) => (
+            <Text key={key} style={enhanced.textLine}>
+              {key}: {value}
+            </Text>
+          ))
+        }
       </View>
 
       <View style={enhanced.card}>
@@ -151,7 +158,7 @@ const enhanced = StyleSheet.create({
     alignItems: "center",
     padding: 16,
     paddingBottom: 60,
-    backgroundColor: "#f9f9f9",
+    backgroundColor: "#c0eef0",
   },
   card: {
     width: "95%",

@@ -7,6 +7,9 @@ from flask_cors import CORS
 import config
 import string
 import re
+import nltk
+from nltk.corpus import stopwords
+nltk.download('stopwords')
 from docx import Document
 from gtts import gTTS
 
@@ -148,7 +151,6 @@ def disfluency_count(transcript):
         "ah": ["ah"],
         "huh": ["huh"],
         "hm": ["hm"],
-        "m": ["m"],
         "thing": ["thing"],
     }
 
@@ -196,7 +198,6 @@ def disfluency_count_from_text(text):
         "ah": ["ah"],
         "huh": ["huh"],
         "hm": ["hm"],
-        "m": ["m"],
         "thing": ["thing"],
     }
 
@@ -254,15 +255,21 @@ def analyze_text_transcript(file_path):
 
 # Function to count the most frequent words
 def count_most_frequent_words(transcript_text):
+    # Load English stopwords
+    stop_words = set(stopwords.words("english"))
+
     # Remove punctuation and convert to lowercase
     translator = str.maketrans("", "", string.punctuation)
     cleaned_text = transcript_text.translate(translator).lower()
     
-    # Split the text into words
+    # Split text into words
     words = cleaned_text.split()
     
+    # Filter out stopwords
+    filtered_words = [word for word in words if word not in stop_words]
+    
     # Count word frequencies
-    word_counts = Counter(words)
+    word_counts = Counter(filtered_words)
     
     # Get the 10 most common words
     most_common_words = word_counts.most_common(10)

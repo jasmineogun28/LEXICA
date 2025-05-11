@@ -1,6 +1,6 @@
 import React from 'react';
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, Dimensions } from 'react-native';
 import FileSelectorUpload from '../FileSelectorUpload';
 import { useRouter } from "expo-router";
 
@@ -18,6 +18,8 @@ export default function Upload() {
   );
 }
 
+const screenWidth = Dimensions.get("window").width;
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -27,11 +29,11 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   title: {
-    fontSize: 50,
+    fontSize: screenWidth < 380 ? 40 : screenWidth < 600 ? 34 : 50,
     fontWeight: '700',
     color: '#023047',
     textAlign: 'center',
-    marginBottom: 40,
+    marginBottom: 20,
   },
   subtitle: {
     fontSize: 30,

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, StyleSheet, Linking, Button } from 'react-native';
+import { Text, View, StyleSheet, Linking, ScrollView, TouchableOpacity } from 'react-native';
 import styles from '../css/_styles';
 
 const tips = [
@@ -42,24 +42,75 @@ export default function LearningPage() {
   };
 
   return (
-    <View style={styles.container}>
+    <ScrollView contentContainerStyle={[enhanced.container, { flexGrow: 1 }]}>
       <Text style={styles.title}>Learning Page</Text>
 
-      <View style={{ marginVertical: 20 }}>
-        <Text style={styles.text}>💡 Tip for Improving Speech or Vocabulary:</Text>
-        <Text style={[styles.text, { marginTop: 10, fontStyle: 'italic' }]}>{currentTip}</Text>
-        <Button title="Next Tip" onPress={shuffleTip} />
+      <View style={enhanced.card}>
+        <Text style={enhanced.sectionTitle}>💡 Tip for Improving Speech or Vocabulary</Text>
+        <Text style={enhanced.tipText}>{currentTip}</Text>
+        <TouchableOpacity style={enhanced.button} onPress={shuffleTip}>
+          <Text style={enhanced.buttonText}>Next Tip</Text>
+        </TouchableOpacity>
       </View>
 
-      <Text style={styles.text}>
-        Please take the time to fill out this short survey about the app.
-      </Text>
-
-      <Button
-        title="Take Survey"
-        onPress={handleSurveyPress}
-        color="#007BFF"
-      />
-    </View>
+      <View style={enhanced.card}>
+        <Text style={enhanced.sectionTitle}>📋 Quick Survey</Text>
+        <Text style={enhanced.text}>
+          Please take the time to fill out this short survey about the app.
+        </Text>
+        <TouchableOpacity style={enhanced.button} onPress={handleSurveyPress}>
+          <Text style={enhanced.buttonText}>Take Survey</Text>
+        </TouchableOpacity>
+      </View>
+    </ScrollView>
   );
 }
+
+const enhanced = StyleSheet.create({
+  container: {
+    padding: 16,
+    paddingBottom: 60,
+    alignItems: 'center',
+    backgroundColor: '#c0eef0',
+  },
+  card: {
+    width: '95%',
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    padding: 16,
+    marginBottom: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 3,
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginBottom: 10,
+    color: '#1d3557',
+  },
+  tipText: {
+    fontSize: 15,
+    fontStyle: 'italic',
+    marginBottom: 15,
+    color: '#333',
+  },
+  text: {
+    fontSize: 15,
+    color: '#444',
+    marginBottom: 10,
+  },
+  button: {
+    backgroundColor: '#007BFF',
+    paddingVertical: 10,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: '#fff',
+    fontWeight: '600',
+    fontSize: 16,
+  },
+});

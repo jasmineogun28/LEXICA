@@ -7,7 +7,8 @@ import {
   Pressable,
   ScrollView,
   KeyboardAvoidingView,
-  Platform
+  Platform,
+  useWindowDimensions
 } from 'react-native';
 import styles from '../css/_styles';
 import AudioRecorderUpload from '../AudioRecorderUpload';
@@ -29,6 +30,8 @@ const topics = [
 export default function Record() {
   const [topic, setTopic] = useState("");
   const [isRecording, setIsRecording] = useState(false);
+  const { width } = useWindowDimensions();
+  const isSmallScreen = width < 400;
 
   const getRandomTopic = () => {
     const index = Math.floor(Math.random() * topics.length);
@@ -41,32 +44,73 @@ export default function Record() {
       style={{ flex: 1 }}
     >
       <ScrollView
-        contentContainerStyle={{ flexGrow: 1 }}
+        contentContainerStyle={{ flexGrow: 1, paddingBottom: 40 }}
         keyboardShouldPersistTaps="handled"
       >
         <View style={[styles.container, { paddingBottom: 40 }]}>
-          <Text style={styles.title}>Record an Audio File</Text>
+          <Text
+            style={[
+              styles.title,
+              isSmallScreen && { fontSize: 28 }
+            ]}
+          >
+            Record an Audio File
+          </Text>
 
           <View style={styles.buttonRow}>
-            <Text style={{ fontSize: 30, fontWeight: '600', marginBottom: 8, color: '#023047' }}>🗣️ Topic:</Text>
-            <Text style={{ fontSize: 30, textAlign: 'center', marginBottom: 12, color: '#023047' }}>
-              {topic || "Tap to generate a topic!"}
-            </Text>
-
-            <Pressable
-              onPress={getRandomTopic}
-              disabled={isRecording}
+            <Text
               style={{
-                backgroundColor: isRecording ? "#ccc" : "#4CAF50",
-                padding: 10,
-                borderRadius: 10,
-                marginBottom: 20,
+                fontSize: 30,
+                fontWeight: '600',
+                marginBottom: 8,
+                color: '#023047'
               }}
             >
-              <Text style={{ color: "#fff", fontWeight: "bold", fontSize: 20 }}>
-                {isRecording ? "Recording..." : "🔄 Shuffle Topic"}
+              🗣️ Topic:
+            </Text>
+
+            <View style={{ height: 90, justifyContent: 'center', marginBottom: 12, marginTop: 12 }}>
+              <Text
+                style={{
+                  fontSize: 30,
+                  textAlign: 'center',
+                  color: '#023047',
+                  maxWidth: 320,
+                  alignSelf: 'center'
+                }}
+              >
+                {topic || "Tap to generate a topic!"}
               </Text>
-            </Pressable>
+            </View>
+
+            <View style={{ alignItems: 'center', width: '100%' }}>
+              <Pressable
+                onPress={getRandomTopic}
+                disabled={isRecording}
+                style={{
+                  backgroundColor: isRecording ? "#ccc" : "#4CAF50",
+                  paddingVertical: 10,
+                  borderRadius: 10,
+                  marginBottom: 20,
+                  width: 240,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                <Text
+                  style={{
+                    color: "#fff",
+                    fontWeight: "bold",
+                    fontSize: 20,
+                    textAlign: 'center',
+                  }}
+                  numberOfLines={1}
+                  adjustsFontSizeToFit={true}
+                >
+                  {isRecording ? "Recording..." : "🔄 Shuffle Topic"}
+                </Text>
+              </Pressable>
+            </View>
 
             <AudioRecorderUpload
               selectedTopic={topic}

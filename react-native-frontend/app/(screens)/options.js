@@ -1,70 +1,79 @@
 import React from "react";
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, TouchableOpacity, StyleSheet, useWindowDimensions, Platform, ScrollView } from "react-native";
 import { useRouter } from "expo-router";
 
 const OptionsScreen = () => {
   const router = useRouter();
+  const { width } = useWindowDimensions();
+  const isSmallScreen = width < 600;
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.text}>
-        Would you like to {'\n'}record a new audio file {'\n'}or upload a file?
+    <ScrollView contentContainerStyle={styles.scrollContainer}>
+      <Text style={[styles.text, isSmallScreen && styles.textSmall]}>
+        Would you like to record a new audio file or upload a file?
       </Text>
 
-      <View style={styles.buttonRow}>
+      <View style={[styles.buttonContainer, isSmallScreen && styles.buttonColumn]}>
         <TouchableOpacity
           style={styles.button}
           onPress={() => router.push("/(screens)/record")}
         >
-          <Text style={styles.buttonText}>RECORD</Text>
+          <Text style={styles.buttonText}>🎙️ Record</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
           style={styles.button}
           onPress={() => router.push("/(screens)/upload")}
         >
-          <Text style={styles.buttonText}>UPLOAD</Text>
+          <Text style={styles.buttonText}>📁 Upload</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
+  scrollContainer: {
+    flexGrow: 1,
     justifyContent: "center",
-    paddingHorizontal: 20,
+    alignItems: "center",
+    padding: 20,
     backgroundColor: "#c0eef0",
   },
   text: {
-    fontSize: 50,
+    fontSize: 40,
     fontWeight: "bold",
     color: "#023047",
     textAlign: "center",
-    marginBottom: 30,
-    fontFamily: "sans-serif",
+    marginBottom: 40,
   },
-  buttonRow: {
+  textSmall: {
+    fontSize: 28,
+  },
+  buttonContainer: {
     flexDirection: "row",
     justifyContent: "center",
+    gap: 20, // will be ignored on Android, but used in web/iOS
+  },
+  buttonColumn: {
+    flexDirection: "column",
     alignItems: "center",
-    gap: 20, // Space between buttons
   },
   button: {
     backgroundColor: "#023047",
-    paddingVertical: 15,
-    paddingHorizontal: 40,
-    borderRadius: 30,
-    elevation: 4,
+    paddingVertical: 14,
+    paddingHorizontal: 30,
+    borderRadius: 25,
+    marginBottom: 20,
+    width: 200,
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 5 },
-    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
     shadowRadius: 5,
+    elevation: 3,
   },
   buttonText: {
-    fontSize: 30,
+    fontSize: 20,
     fontWeight: "bold",
     color: "#fff",
     textAlign: "center",
